@@ -6,7 +6,7 @@ module.exports = {
 
   show: function(req, res) {
      console.log("elevation: ",req.body.num);
-     var url = 'http://api.nytimes.com/svc/semantic/v2/geocodes/query.json?elevation='+req.body.num+'_&feature_class=L&api-key=ff62a97c93177379eacfb6d22d6f5738:6:74536061';
+     var url = 'http://api.nytimes.com/svc/semantic/v2/geocodes/query.json?elevation='+req.body.num+'_&feature_class=L&api-key=';
      // console.log("preformatted url: ",url);
      request(url, function(error, response, body) {
         if(!error && response.statusCode == 200) {
@@ -24,5 +24,5 @@ module.exports = {
       res.json(customers);
     })
   }
-  
+
 }

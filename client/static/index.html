@@ -22,7 +22,7 @@
 	<script>
 
 	$(document).ready(function(){
-		$.get("http://api.nytimes.com/svc/semantic/v2/geocodes/query.json?elevation=8000_&feature_class=L&country_code=US&api-key=ff62a97c93177379eacfb6d22d6f5738:6:74536061", function(res){
+		$.get("http://api.nytimes.com/svc/semantic/v2/geocodes/query.json?elevation=8000_&feature_class=L&country_code=US&api-key=", function(res){
 				// console.log("geo api data from nytimes: ", res);
 				var str = "";
 					str += "<h4>Snapshot (greater than 8000m)</h4> <br>";
