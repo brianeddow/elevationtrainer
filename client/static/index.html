@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+	<title>Elevation Trainer</title>
+
+	<link href='style.css' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Amatic+SC:700' rel='stylesheet' type='text/css'>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-route.min.js"></script>
+	<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+	<script>
+
+	$(document).ready(function(){
+		$.get("http://api.nytimes.com/svc/semantic/v2/geocodes/query.json?elevation=8000_&feature_class=L&country_code=US&api-key=ff62a97c93177379eacfb6d22d6f5738:6:74536061", function(res){
+				// console.log("geo api data from nytimes: ", res);
+				var str = "";
+					str += "<h4>Snapshot (greater than 8000m)</h4> <br>";
+					str += "<ul>";
+				for(var i=0; i<res.results.length; i++){
+					str += "<li>"
+					str += "<em>" + res.results[i].name + "</em>, "+ res.results[i].country_name + "<br>";
+					str += "</li>";
+				}
+					str += "</ul>";
+				$('#api').html(str);
+		}, 'json');
+	})
+
+	var myApp = angular.module('myApp', ['ngRoute']);
+
+	myApp.config(function($routeProvider){
+		$routeProvider
+			.when('/about',{
+				templateUrl: './partials/about.html'
+			})
+			.when('/search',{
+				templateUrl: './partials/search.html'
+			})
+			.when('/initiatives',{
+				templateUrl: './partials/initiatives.html'
+			})
+			.when('/home',{
+				templateUrl: './partials/home.html'
+			})
+			.otherwise({
+				redirectTo: '/home'
+			});
+	})
+
+	myApp.factory('SearchFactory', function($http){
+		var altitudes = [
+			'8000',
+			'9000',
+			'10000',
+			'11000',
+			'12000'
+		];
+
+		var locsByAltitude = [];
+
+		var factory = {};
+
+		factory.getAltitude = function(callback){
+			callback(altitudes);
+		}
+
+		factory.searchByAltitude = function(Altitude, callback){
+			// console.log("altitude in factory: ", Number(Altitude.num));
+			$http.post('/find', {num: Altitude.num}).success(function(data){
+				// console.log('api request from node: ', data);
+				locsByAltitude = data;
+				callback(locsByAltitude);
+			})
+		}
+
+		return factory;
+	})
+
+	myApp.controller('SearchController', function($scope, SearchFactory){
+		$scope.altitudes = [];
+		$scope.locsByAltitude = [];
+
+		SearchFactory.getAltitude(function(data){
+			$scope.altitudes = data;
+		})
+
+		$scope.searchAltitude = function(){
+			// console.log("altitude value from search: ",$scope.searchAltitude.num);
+			SearchFactory.searchByAltitude($scope.searchAltitude, function(output){
+				// console.log('api data in controller: ',output);
+				$scope.locsByAltitude = JSON.parse(output);
+				console.log("in controller", $scope.locsByAltitude);
+			})
+		}
+	})
+
+	myApp.factory('InitiativesFactory', function($http){
+
+		var time = [
+			'3 weeks',
+			'1 month',
+			'1 month 2 weeks',
+			'2 months',
+		];
+		var users = [];
+		var addInits = [];
+		var inits = [];
+
+		var factory = {};
+
+		factory.getAltitudes = function(callback){
+			callback(altitudes);
+		}
+
+		factory.getTime = function(callback){
+			callback(time);
+		}
+
+		factory.newUser = function(newUser, callback){
+			$http.post('/users/new', newUser).success(function(output){
+				users.push(output);
+				callback(users);
+			})
+		}
+
+		factory.getUsers = function(callback){
+			$http.get('/users').success(function(output){
+				console.log("users from mongo: ",output);
+				users = output;
+				// console.log("users: ",users);
+				callback(users);
+			})
+		}
+
+		factory.addInit = function(newInit, callback){
+			console.log('new init in factory: ',newInit);
+			$http.post('/inits/'+newInit._user, newInit).success(function(output){
+				console.log(output);
+			})
+		}
+
+		factory.getInits = function(id, callback){
+			// console.log("user id in inits factory: ",id);
+			$http.get('/inits/'+id).success(function(output){
+				console.log("inits from mongo in factory: ",output);
+				inits = output;
+				callback(inits);
+			})
+		}
+
+		return factory;
+	})
+
+	myApp.controller('InitiativesController', function($scope, InitiativesFactory){
+		$scope.time = [];
+		$scope.users = [];
+		$scope.addInits = [];
+		$scope.inits = [];
+
+		InitiativesFactory.getTime(function(data){
+			console.log("times from initiatives factory:",data);
+			$scope.time = data;
+		})
+
+		InitiativesFactory.getUsers(function(data){
+			console.log("users in init controller: ",data);
+			$scope.users = data;
+			// console.log("LoggedIn user: ",$scope.users[$scope.users.length-1].name);
+			$scope.loggedInUser = $scope.users[$scope.users.length-1];
+		})
+
+		$scope.addUser = function(){
+			console.log($scope.newUser);
+			InitiativesFactory.newUser($scope.newUser, function(data){
+				console.log("new user from mongo: ", data);
+				$scope.users.push(data);
+				$scope.newUser = {};
+			})
+		}
+
+		$scope.addInit = function(){
+			$scope.newInit._user = $scope.users[$scope.users.length-1]._id
+			console.log("newInit: ",$scope.newInit._user);
+			InitiativesFactory.addInit($scope.newInit, function(data){
+				console.log("updated initiatives from factory: ",data);
+				$scope.addInits.push(data);
+				$scope.newInit = {};
+			})
+		}
+
+		$scope.getInits = function(){
+			$scope.id = $scope.loggedInUser._id;
+			// console.log("user id in inits controller: ",$scope.id);
+			InitiativesFactory.getInits($scope.id, function(data){
+				// console.log("inits from factory: ",data);
+				$scope.inits = data;
+			})
+		}
+
+	})
+
+	myApp.controller('DashboardController', function($scope,  SearchFactory, InitiativesFactory){
+		$scope.locations = [];
+		$scope.initiatives = [];
+		$scope.limit = 6;
+
+		$scope.moreAltitudes = function(){
+			$scope.limit += 3;
+		}
+	})
+
+	</script>
+</head>
+<body class="bg-orange">
+
+	<div class="padding-left bg-white bg-width col-md-offset-2 col-md-8">
+		<table>
+			<tr>
+				<td class="gray floor">
+				 	<h1 class="headline">
+				 		Elevation <span class="red headline">Trainer</span>
+				 	</h1>
+				</td>
+				<td>
+					<img src="/banner.jpg" class="sky">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<a class="btn btn-default btn-md" href="#/home">Home</a>
+					<a class="btn btn-info btn-md" href="#/about">About</a>
+					<a class="btn btn-warning btn-md" href="#/search">Search</a>
+					<a class="btn btn-warning btn-md" href="#/initiatives">Initiatives</a>
+				</td>
+			</tr>
+		</table>
+
+		<table class="top">
+			<tr>
+				<td class="top main-content padding-right dashed-orange-border-bottom">
+					<div id="api"></div>
+				</td>
+				<td class="top padding-right dashed-orange-border-left dashed-orange-border-bottom">
+					<div ng-view=""></div>
+					<br />
+				</td>
+			</tr>
+		</table>
+
+		<table>
+			<tr>
+				<td>Design Copyright &copy; 2016-2017 Brian Eddow</td>
+			</tr>
+			<tr>
+				<td>Data Copyright &copy; NYTimes.com</td>
+			</tr>
+		</table>
+	</div>
+
+
+</body>
+</html>

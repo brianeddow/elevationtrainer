@@ -1,0 +1,65 @@
+<div ng-controller="InitiativesController" class="padding-left">
+
+<p ng-if="users.length > 0">Hello, {{ loggedInUser.name }}!</p>
+
+	<hr>
+
+	<p>New to Altitude Trainer? Start here!</p>
+	<p>
+		<input type="text" ng-model="newUser.name" placeholder="Name" class="form-control" />
+	</p>
+	<p>
+		<input type="submit" ng-click="addUser()" value="Let's go!" class="form-control btn btn-warning" />
+	</p>
+
+	<hr>
+
+	<h4>Create a new initiative</h4>
+	<p>Location
+		<input type="text" ng-model="newInit.location" placeholder="Yosemite National Park" class="form-control" />
+	</p>
+
+	<p>Duration
+		<select ng-model='newInit.duration' class="form-control">
+			<option ng-repeat='t in time' ng-value='newInit.duration'>{{ t }}</option>
+		</select>
+	</p>
+
+	<p>Commitment
+		<input type="text" ng-model="newInit.commitment"
+		placeholder="For 4 weeks I will..." class="form-control" />
+	</p>
+
+	<p><input type="submit" ng-click="addInit()" value="Create Initiative" class="form-control btn btn-warning" /></p>
+
+	<hr>
+
+	<p>
+		<input type="submit" ng-click="getInits()" value="Show Initiatives" class="form-control btn btn-warning" />
+	</p>
+
+	<div>
+
+		<table class="data inits" ng-if="inits.initiatives.length > 0">
+			<thead>
+				<tr class="top border_bottom bg_orange white">
+					<th>Location</th>
+					<th>Duration</th>
+					<th>Commitment</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="init in inits.initiatives | filter: filter_name" class="top">
+					<td class="border-right inits-padding-left">{{ init.location }}</td>
+					<td class="border-right inits-padding-left">{{ init.duration }}</td>
+					<td class="inits-padding-left">{{ init.commitment }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<div ng-if="inits.initiatives.length == 0">
+			<p>You have no initiatives yet</p>
+		</div>
+
+	</div>
+
+</div>

@@ -1,0 +1,43 @@
+<div ng-controller="ProductsController">
+
+	<table>
+		<tr>
+			<td style="vertical-align: top;">
+
+				<div>
+				<input type="text" ng-model='filter_name'  placeholder="search..." />
+
+				<p>Add a new product</p>
+
+				Name:<br />
+				<input type="text" ng-model="newProduct.name" /><br />
+				Image (url):<br />
+				<input type="text" ng-model="newProduct.url" /><br />
+				Description:<br />
+				<input type="text" ng-model="newProduct.desc" /><br />
+				Initial Quantity:<br />
+				<select ng-model="newProduct.quantity">
+					<option ng-repeat="num in quantity" ng-value="newOrder.quantity" value={{ num }}>{{ num }}</option>
+				</select>
+				<input type="submit" ng-click="addProduct()" value="Create" />
+
+				</div>
+
+			</td>
+			<td style="padding-left: 20px;width: 700px;">
+
+				<div ng-repeat="product in products | filter: filter_name | limitTo: limit" style="vertical-align: top; display: inline-block;">
+					<img src="{{ product.url }}" width=120 height=120><br />
+					{{ product.name }}
+					<button ng-click="removeProduct(product)">Remove</button>
+					<p>({{ product.quantity }} left)</p>
+					<!-- <p>{{ product.desc }}</p> -->
+				</div>
+				<p><a ng-click="incrementLimit()">show more...</a></p>
+
+			</td>
+		</tr>
+	</table>
+
+
+</div>

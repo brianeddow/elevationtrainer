@@ -1,0 +1,32 @@
+<div ng-controller="SearchController" class="padding-left">
+
+	<h4>Search Elevation</h4>
+	<p>Elevation (greater than):
+		<select ng-model="searchAltitude.num">
+			<option ng-repeat='alt in altitudes' value="{{ alt }}" ng-value="searchAltitude.num">{{ alt }}</option>
+		</select> meters</p>
+	<p>
+		<input type="submit" value="Find" ng-click="searchAltitude()" class="form-control btn btn-warning" /></p>
+
+	<div>
+
+		<table class="data" ng-if="locsByAltitude.results">
+			<thead>
+				<tr class="border_bottom bg-white">
+					<th>State</th>
+					<th class="extra-space">Country</th>
+					<th>Lat/Long</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="loc in locsByAltitude.results">
+					<td><em>{{ loc.concept_name }}</em></td>
+					<td><strong>{{ loc.country_code }}</strong></td>
+					<td>[{{ loc.latitude }}, {{ loc.longitude }}]</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+</div>
