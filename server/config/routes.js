@@ -1,13 +1,17 @@
 var express = require('express');
-var app = express(); 
+var app = express();
 var Altitudes = require('../controllers/altitudes.js');
 var Users = require('../controllers/users.js');
 var Initiatives = require('../controllers/inits.js');
 
 module.exports = function(app) {
 
+  app.get('/snapshot', function(req, res){
+    Altitudes.snapshot(req, res)
+  })
+
   app.post('/find', function(req, res){
-  	console.log("search in routes: ",req.body);
+    // console.log("search in routes: ",req.body);
   	Altitudes.show(req, res)
   })
 
@@ -32,6 +36,5 @@ module.exports = function(app) {
   	// console.log("id: ",req.params.id);
   	Users.showInits(req, res);
   })
-
 
 }
