@@ -170,7 +170,7 @@
 			console.log("users in init controller: ",data);
 			$scope.users = data;
 			// console.log("LoggedIn user: ",$scope.users[$scope.users.length-1].name);
-			$scope.loggedInUser = $scope.users[$scope.users.length-1];
+			// $scope.loggedInUser = $scope.users[$scope.users.length-1];
 		})
 
 		$scope.addUser = function(){
@@ -178,6 +178,7 @@
 			InitiativesFactory.newUser($scope.newUser, function(data){
 				console.log("new user from mongo: ", data);
 				$scope.users.push(data);
+				$scope.loggedInUser = $scope.users[$scope.users.length-1];
 				$scope.newUser = {};
 			})
 		}
