@@ -53,6 +53,7 @@
 
 		var locsByAltitude = [];
 		var snapshot = [];
+		var foundUser = [];
 
 		var factory = {};
 
@@ -74,6 +75,15 @@
 				// console.log('api request from node: ', data);
 				locsByAltitude = data;
 				callback(locsByAltitude);
+			})
+		}
+
+		factory.findUser = function(foundUser, callback){
+			$http.get('/user/'+foundUser.name+'/').success(function(output){
+				console.log("user found: ",output);
+				foundUser = output;
+				// console.log("users: ",users);
+				callback(foundUser);
 			})
 		}
 
@@ -145,7 +155,7 @@
 
 		factory.getInits = function(id, callback){
 			// console.log("user id in inits factory: ",id);
-			$http.get('/inits/'+id).success(function(output){
+			$http.get('/inits/'+id+'/').success(function(output){
 				console.log("inits from mongo in factory: ",output);
 				inits = output;
 				callback(inits);
@@ -155,11 +165,19 @@
 		return factory;
 	})
 
-	myApp.controller('InitiativesController', function($scope, InitiativesFactory){
+	myApp.controller('InitiativesController', function($scope, InitiativesFactory, SearchFactory){
 		$scope.time = [];
 		$scope.users = [];
-		$scope.addInits = [];
+		// $scope.addInits = [];
+		// $scope.flag = 0;
 		$scope.inits = [];
+		$scope.newInit = {};
+		$scope.newUser = {};
+		$scope.searchUser = {};
+		$scope.startOver = false;
+		$scope.showNew = true;
+		$scope.showUser = false;
+		$scope.findUser = false;
 
 		InitiativesFactory.getTime(function(data){
 			console.log("times from initiatives factory:",data);
@@ -179,15 +197,27 @@
 				console.log("new user from mongo: ", data);
 				$scope.users.push(data);
 				$scope.newUser = {};
+				InitiativesFactory.getUsers(function(data){
+					$scope.users = data;
+					$scope.loggedInUser = $scope.users[$scope.users.length-1];
+					$scope.showNew = false;
+					$scope.showUser = true;
+				})
 			})
 		}
 
 		$scope.addInit = function(){
+			console.log('new initiative',$scope.newInit);
 			$scope.newInit._user = $scope.users[$scope.users.length-1]._id
-			console.log("newInit: ",$scope.newInit._user);
+			console.log("user assigned to initiative: ",$scope.newInit._user);
+
 			InitiativesFactory.addInit($scope.newInit, function(data){
 				console.log("updated initiatives from factory: ",data);
 				$scope.addInits.push(data);
+			})
+
+			InitiativesFactory.getInits($scope.loggedInUser._id, function(data){
+				$scope.inits = data;
 				$scope.newInit = {};
 			})
 		}
@@ -197,6 +227,37 @@
 			// console.log("user id in inits controller: ",$scope.id);
 			InitiativesFactory.getInits($scope.id, function(data){
 				// console.log("inits from factory: ",data);
+				$scope.inits = data;
+			})
+
+			$scope.showUser = true;
+		}
+
+		$scope.beginAsNewUser = function(){
+			$scope.showUser = false;
+			$scope.showNew = true;
+			$scope.newInit = {};
+			$scope.inits = [];
+		}
+
+		$scope.promptFindUser = function(){
+			$scope.findUser = true;
+			$scope.showUser = false;
+			$scope.newInit = {};
+			$scope.inits = [];
+		}
+
+		$scope.getUser = function(){
+			console.log('getUser ',$scope.searchUser);
+			SearchFactory.findUser($scope.searchUser, function(data){
+				console.log('foundUser: ',data);
+				$scope.loggedInUser = data;
+				$scope.searchUser = {};
+				$scope.findUser = false;
+				$scope.inits = [];
+			})
+
+			InitiativesFactory.getInits($scope.loggedInUser._id, function(data){
 				$scope.inits = data;
 			})
 		}

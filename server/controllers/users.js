@@ -24,7 +24,7 @@ module.exports = {
                 console.log("error: ",err);
               } else {
                 res.json("hello");
-              } 
+              }
             });
         });
     });
@@ -42,6 +42,13 @@ module.exports = {
           res.json(user);
         }
       });
+  },
+
+  getUser: function(req,res){
+      console.log('findUser: ',req.params.name)
+      Users.findOne({name: req.params.name}, function(err,user){
+          res.json(user);
+      })
   },
 
   find: function(req, res) {
@@ -67,5 +74,5 @@ module.exports = {
       res.json(orders);
     })
   }
-  
+
 }

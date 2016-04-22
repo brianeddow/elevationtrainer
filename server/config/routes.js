@@ -19,6 +19,10 @@ module.exports = function(app) {
   	Users.find(req, res)
   })
 
+  app.get('/user/:name', function(req,res){
+      Users.getUser(req,res);
+  })
+
   app.post('/users/new', function(req, res){
     Users.create(req, res)
   })
