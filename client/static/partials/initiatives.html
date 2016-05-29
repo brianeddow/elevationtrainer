@@ -1,6 +1,5 @@
 <div ng-controller="InitiativesController" class="padding-left">
 
-	<div ng-if="showNew == false">
 		<table>
 			<tr>
 				<td>
@@ -14,9 +13,8 @@
 			</tr>
 		</table>
 		<br />
-	</div>
 
-	<div ng-if="findUser == true">
+	<div ng-if="findUser">
 		<p><input type="text" ng-model="searchUser.name" class="form-control" /></p>
 		<p><input type="submit" ng-click="getUser()" class="btn btn-default" /></p>
 	</div>
@@ -25,10 +23,10 @@
 
 	<hr>
 
-	<div ng-if="showNew == true">
+	<div ng-if="showNew">
 		<p>New to Elevation Trainer? Start here!</p>
 		<p>
-			<input type="text" ng-model="newUser.name" placeholder="Name" class="form-control" />
+			<input type="text" ng-model="$parent.newUser.name" placeholder="Name" class="form-control" />
 		</p>
 		<p>
 			<input type="submit" ng-click="addUser()" value="Let's go!" class="form-control btn btn-warning" />
